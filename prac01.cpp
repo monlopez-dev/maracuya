@@ -6,28 +6,52 @@
 
 #include <GLFW/glfw3.h>
 
-// Shaders
-#include "Shader.h"
-
-void resize(GLFWwindow* window, int width, int height);
-
 const GLint WIDTH = 800, HEIGHT = 600;
+
+// Shaders
+const GLchar* vertexShaderSource = 
+{
+	"#version 330 core\n"
+	"layout (location = 0) in vec3 position;\n"
+	"void main()\n"
+	"{\n"
+	"gl_Position = vec4(position.x, position.y, position.z, 1.0);\n"
+	"}\0" 
+};
+const GLchar* fragmentShaderSource = 
+{
+	"#version 330 core\n"
+	"out vec4 color;\n"
+	"void main()\n"
+	"{\n"
+	"color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+	"}\n\0"
+};
+
+// Funciones de configuracion del shader
+
+void CrearShader(void);
+
+
 
 
 int main() {
 	glfwInit();
-	//Verificaciï¿½n de compatibilidad 
-	/*glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	//Verificación de compatibilidad 
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);*/
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "Dibujo de Primitivas en 2D", NULL, NULL);
-	glfwSetFramebufferSizeCallback(window, resize);
+	GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "Practica 0", nullptr, nullptr);
 	
-	//Verificaciï¿½n de errores de creacion  ventana
-	if (window== NULL) 
+	int screenWidth, screenHeight;
+
+	glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
+
+	//Verificación de errores de creacion  ventana
+	if (nullptr == window) 
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
@@ -38,7 +62,7 @@ int main() {
 	glfwMakeContextCurrent(window);
 	glewExperimental = GL_TRUE;
 
-	//Verificaciï¿½n de errores de inicializaciï¿½n de glew
+	//Verificación de errores de inicialización de glew
 
 	if (GLEW_OK != glewInit()) {
 		std::cout << "Failed to initialise GLEW" << std::endl;
@@ -53,57 +77,41 @@ int main() {
 
 
 	// Define las dimensiones del viewport
-	//glViewport(0, 0, screenWidth, screenHeight);
+	glViewport(0, 0, screenWidth, screenHeight);
 
-    Shader ourShader("Shader/core.vs", "Shader/core.frag");
+	//CrearShader();
 
 	// Set up vertex data (and buffer(s)) and attribute pointers
-	float vertices[] = {
-		0.5f,  0.5f, 0.0f,    1.0f,0.0f,0.0f,  // top right
-		0.5f, -0.5f, 0.0f,    1.0f,1.0f,0.0f,  // bottom right
-		-0.5f, -0.5f, 0.0f,   1.0f,0.0f,1.0f,  // bottom left
-		-0.5f,  0.5f, 0.0f,   1.0f,1.0f,0.0f, // top left 
-	};
-	unsigned int indices[] = {  // note that we start from 0!
-		3,2,1,// second Triangle
-		0,1,3,
-		
+	GLfloat vertices[] =
+	{
+		-0.5f, -0.5f, 0.0f, // Left
+		0.5f, -0.5f, 0.0f, // Right
+		0.0f,  0.5f, 0.0f  // Top
 	};
 
 
-
-	GLuint VBO, VAO,EBO;
+	GLuint VBO, VAO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-
-	// Enlazar  Vertex Array Object
+	// Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
 	glBindVertexArray(VAO);
 
-	//2.- Copiamos nuestros arreglo de vertices en un buffer de vertices para que OpenGL lo use
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	// 3.Copiamos nuestro arreglo de indices en  un elemento del buffer para que OpenGL lo use
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	// 4. Despues colocamos las caracteristicas de los vertices
-
-	//Posicion
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid *)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
 	glEnableVertexAttribArray(0);
 
-	//Color
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid *)(3*sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+	glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
 
 	glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs)
 
 
 	
+	
+
+
+
 	while (!glfwWindowShouldClose(window))
 	{
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
@@ -111,28 +119,16 @@ int main() {
 
 		// Render
 		// Clear the colorbuffer
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 
 		// Draw our first triangle
-        ourShader.Use();
-        glBindVertexArray(VAO);
 
+		glBindVertexArray(VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glBindVertexArray(0);
 
-        glPointSize(1);
-        //glDrawArrays(GL_POINTS,0,4);
-        
-        //glDrawArrays(GL_LINES,0,2);
-		//glDrawArrays(GL_LINES, 0, 4);
-        //glDrawArrays(GL_LINE_LOOP,0,4);
-        
-        //glDrawArrays(GL_TRIANGLES,0,3);
-        //glDrawElements(GL_TRIANGLES, 3,GL_UNSIGNED_INT,0);
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-       
-        glBindVertexArray(0);
-    
 		// Swap the screen buffers
 		glfwSwapBuffers(window);
 	}
@@ -143,9 +139,67 @@ int main() {
 	return EXIT_SUCCESS;
 }
 
-void resize(GLFWwindow* window, int width, int height)
+void CrearShader()
 {
-	// Set the Viewport to the size of the created window
-	glViewport(0, 0, width, height);
-	//glViewport(0, 0, screenWidth, screenHeight);
+    // Creamos el vertex shader y guardamos su identificador
+	// Vertex shader
+	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+	glCompileShader(vertexShader);
+
+
+	// Verificamos los errores en tiempo de ejecución
+	GLint success;
+	GLchar infoLog[512];
+
+
+	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+
+	
+	if (!success)
+	{
+		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+	}
+
+
+	// Creamos el fragment shader y guardamos su identificador
+	// Fragment shader
+	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+	glCompileShader(fragmentShader);
+
+	// Verificamos los errores en tiempo de ejecución
+
+	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+
+	if (!success)
+	{
+		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+	}
+
+	// Creamos un nuevo programa y se asignamos
+	// sus correspondientes vertex y fragment shaders
+	GLuint shaderProgram = glCreateProgram();
+	glAttachShader(shaderProgram, vertexShader);
+	glAttachShader(shaderProgram, fragmentShader);
+	glLinkProgram(shaderProgram);
+	glUseProgram(shaderProgram);
+
+	// Verificamos que no hay error en el programa
+	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+
+	if (!success)
+	{
+		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+	}
+
+
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+
+
 }
+
