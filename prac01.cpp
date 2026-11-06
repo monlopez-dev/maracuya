@@ -1,54 +1,41 @@
 #include<iostream>
+
+//#define GLEW_STATIC
+
 #include <GL/glew.h>
+
 #include <GLFW/glfw3.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 
+
 // Shaders
 #include "Shader.h"
 
-void Inputs(GLFWwindow *window);
+const GLint WIDTH = 800, HEIGHT = 600;
 
-
-const GLint WIDTH = 1200, HEIGHT = 800;
-
-//For Keyboard
-float	movX = 0.0f,
-movY = 0.0f,
-movZ = -5.0f,
-rot = 0.0f;
-
-//For model
-float	hombro = 0.0f;
-float	codo= 0.0f;
-float	mano = 0.0f;
-float	falange1 = 0.0f;
-float	falange2 = 0.0f;
-float	falange3= 0.0f;
-float	falange4 = 0.0f;
-float	falange5 = 0.0f;
-float	falange6 = 0.0f;
 
 int main() {
 	glfwInit();
-	//Verificación de compatibilidad 
+	//Verificaciï¿½n de compatibilidad 
 	// Set all the required options for GLFW
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	/*glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);*/
 
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "Modelado jerarquico", nullptr, nullptr);
+	GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "Proyecciones y transformaciones basicas", nullptr, nullptr);
 
 	int screenWidth, screenHeight;
 
 	glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
 
-	//Verificación de errores de creacion  ventana
+	//Verificaciï¿½n de errores de creacion  ventana
 	if (nullptr == window)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -60,7 +47,7 @@ int main() {
 	glfwMakeContextCurrent(window);
 	glewExperimental = GL_TRUE;
 
-	//Verificación de errores de inicialización de glew
+	//Verificaciï¿½n de errores de inicializaciï¿½n de glew
 
 	if (GLEW_OK != glewInit()) {
 		std::cout << "Failed to initialise GLEW" << std::endl;
@@ -87,52 +74,94 @@ int main() {
 	// Set up vertex data (and buffer(s)) and attribute pointers
 	// use with Orthographic Projection
 
-
+	//glfloat vertices[] = {
+ //      -0.5f*500, -0.5f, 0.5f, 1.0f, 0.0f,0.0f,//front
+	//	0.5f * 500, -0.5f * 500, 0.5f * 500,  1.0f, 0.0f,0.0f,
+	//	0.5f * 500,  0.5f * 500, 0.5f * 500,  1.0f, 0.0f,0.0f,
+	//	0.5f * 500,  0.5f * 500, 0.5f * 500,  1.0f, 0.0f,0.0f,
+	//	-0.5f * 500,  0.5f * 500, 0.5f * 500, 1.0f, 0.0f,0.0f,
+	//	-0.5f * 500, -0.5f * 500, 0.5f * 500, 1.0f, 0.0f,0.0f,
+	//	
+	//    -0.5f * 500, -0.5f * 500,-0.5f * 500, 0.0f, 1.0f,0.0f,//back
+	//	 0.5f * 500, -0.5f * 500,-0.5f * 500, 0.0f, 1.0f,0.0f,
+	//	 0.5f * 500,  0.5f * 500,-0.5f * 500, 0.0f, 1.0f,0.0f,
+	//	 0.5f * 500,  0.5f * 500,-0.5f * 500, 0.0f, 1.0f,0.0f,
+	//    -0.5f * 500,  0.5f * 500,-0.5f * 500, 0.0f, 1.0f,0.0f,
+	//    -0.5f * 500, -0.5f * 500,-0.5f * 500, 0.0f, 1.0f,0.0f,
+	//	
+	//	 0.5f * 500, -0.5f * 500,  0.5f * 500,  0.0f, 0.0f,1.0f,
+	//	 0.5f * 500, -0.5f * 500, -0.5f * 500,  0.0f, 0.0f,1.0f,
+	//	 0.5f * 500,  0.5f * 500, -0.5f * 500,  0.0f, 0.0f,1.0f,
+	//	 0.5f * 500,  0.5f * 500, -0.5f * 500,  0.0f, 0.0f,1.0f,
+	//	 0.5f * 500,  0.5f * 500,  0.5f * 500,  0.0f, 0.0f,1.0f,
+	//	 0.5f * 500,  -0.5f * 500, 0.5f * 500, 0.0f, 0.0f,1.0f,
+ //     
+	//	-0.5f * 500,  0.5f * 500,  0.5f * 500,  1.0f, 1.0f,0.0f,
+	//	-0.5f * 500,  0.5f * 500, -0.5f * 500,  1.0f, 1.0f,0.0f,
+	//	-0.5f * 500, -0.5f * 500, -0.5f * 500,  1.0f, 1.0f,0.0f,
+	//	-0.5f * 500, -0.5f * 500, -0.5f * 500,  1.0f, 1.0f,0.0f,
+	//	-0.5f * 500, -0.5f * 500,  0.5f * 500,  1.0f, 1.0f,0.0f,
+	//	-0.5f * 500,  0.5f * 500,  0.5f * 500,  1.0f, 1.0f,0.0f,
+	//	
+	//	-0.5f * 500, -0.5f * 500, -0.5f * 500, 0.0f, 1.0f,1.0f,
+	//	0.5f * 500, -0.5f * 500, -0.5f * 500,  0.0f, 1.0f,1.0f,
+	//	0.5f * 500, -0.5f * 500,  0.5f * 500,  0.0f, 1.0f,1.0f,
+	//	0.5f * 500, -0.5f * 500,  0.5f * 500,  0.0f, 1.0f,1.0f,
+	//	-0.5f * 500, -0.5f * 500,  0.5f * 500, 0.0f, 1.0f,1.0f,
+	//	-0.5f * 500, -0.5f * 500, -0.5f * 500, 0.0f, 1.0f,1.0f,
+	//	
+	//	-0.5f * 500,  0.5f * 500, -0.5f * 500, 1.0f, 0.2f,0.5f,
+	//	0.5f * 500,  0.5f * 500, -0.5f * 500,  1.0f, 0.2f,0.5f,
+	//	0.5f * 500,  0.5f * 500,  0.5f * 500,  1.0f, 0.2f,0.5f,
+	//	0.5f * 500,  0.5f * 500,  0.5f * 500,  1.0f, 0.2f,0.5f,
+	//	-0.5f * 500,  0.5f * 500,  0.5f * 500, 1.0f, 0.2f,0.5f,
+	//	-0.5f * 500,  0.5f * 500, -0.5f * 500, 1.0f, 0.2f,0.5f,
+	//};
 	
 
 	// use with Perspective Projection
 	float vertices[] = {
-		-0.5f, -0.5f, 0.5f, 
-		0.5f, -0.5f, 0.5f,  
-		0.5f,  0.5f, 0.5f,  
-		0.5f,  0.5f, 0.5f,  
-		-0.5f,  0.5f, 0.5f, 
-		-0.5f, -0.5f, 0.5f, 
+		-0.5f, -0.5f, 0.5f, 1.0f, 0.0f,0.0f,//front
+		0.5f, -0.5f, 0.5f,  1.0f, 0.0f,0.0f,
+		0.5f,  0.5f, 0.5f,  1.0f, 0.0f,0.0f,
+		0.5f,  0.5f, 0.5f,  1.0f, 0.0f,0.0f,
+		-0.5f,  0.5f, 0.5f, 1.0f, 0.0f,0.0f,
+		-0.5f, -0.5f, 0.5f, 1.0f, 0.0f,0.0f,
 		
-	    -0.5f, -0.5f,-0.5f, 
-		 0.5f, -0.5f,-0.5f, 
-		 0.5f,  0.5f,-0.5f, 
-		 0.5f,  0.5f,-0.5f, 
-	    -0.5f,  0.5f,-0.5f, 
-	    -0.5f, -0.5f,-0.5f, 
+	    -0.5f, -0.5f,-0.5f, 0.0f, 1.0f,0.0f,//back
+		 0.5f, -0.5f,-0.5f, 0.0f, 1.0f,0.0f,
+		 0.5f,  0.5f,-0.5f, 0.0f, 1.0f,0.0f,
+		 0.5f,  0.5f,-0.5f, 0.0f, 1.0f,0.0f,
+	    -0.5f,  0.5f,-0.5f, 0.0f, 1.0f,0.0f,
+	    -0.5f, -0.5f,-0.5f, 0.0f, 1.0f,0.0f,
 		
-		 0.5f, -0.5f,  0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  -0.5f, 0.5f,
+		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, 0.0f,1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f, 0.0f,1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f, 0.0f,1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f, 0.0f,1.0f,
+		 0.5f,  -0.5f, 0.5f, 0.0f, 0.0f,1.0f,
       
-		-0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f,  1.0f, 1.0f,0.0f,
+		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,0.0f,
+		-0.5f, -0.5f, -0.5f,  1.0f, 1.0f,0.0f,
+		-0.5f, -0.5f, -0.5f,  1.0f, 1.0f,0.0f,
+		-0.5f, -0.5f,  0.5f,  1.0f, 1.0f,0.0f,
+		-0.5f,  0.5f,  0.5f,  1.0f, 1.0f,0.0f,
 		
-		-0.5f, -0.5f, -0.5f,
-		0.5f, -0.5f, -0.5f, 
-		0.5f, -0.5f,  0.5f, 
-		0.5f, -0.5f,  0.5f, 
-		-0.5f, -0.5f,  0.5f,
-		-0.5f, -0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,1.0f,
+		0.5f, -0.5f,  0.5f,  0.0f, 1.0f,1.0f,
+		0.5f, -0.5f,  0.5f,  0.0f, 1.0f,1.0f,
+		-0.5f, -0.5f,  0.5f, 0.0f, 1.0f,1.0f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,1.0f,
 		
-		-0.5f,  0.5f, -0.5f,
-		0.5f,  0.5f, -0.5f, 
-		0.5f,  0.5f,  0.5f, 
-		0.5f,  0.5f,  0.5f, 
-		-0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f, -0.5f,
+		-0.5f,  0.5f, -0.5f, 1.0f, 0.2f,0.5f,
+		0.5f,  0.5f, -0.5f,  1.0f, 0.2f,0.5f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.2f,0.5f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.2f,0.5f,
+		-0.5f,  0.5f,  0.5f, 1.0f, 0.2f,0.5f,
+		-0.5f,  0.5f, -0.5f, 1.0f, 0.2f,0.5f,
 	};
 
 
@@ -149,13 +178,19 @@ int main() {
 	//2.- Copiamos nuestros arreglo de vertices en un buffer de vertices para que OpenGL lo use
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	
+	// 3.Copiamos nuestro arreglo de indices en  un elemento del buffer para que OpenGL lo use
+	/*glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);*/
+
+	// 4. Despues colocamos las caracteristicas de los vertices
 
 	//Posicion
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3* sizeof(GLfloat), (GLvoid *)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid *)0);
 	glEnableVertexAttribArray(0);
 
-	
+	//Color
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -165,135 +200,85 @@ int main() {
 	
 	glm::mat4 projection=glm::mat4(1);
 
-	projection = glm::perspective(glm::radians(45.0f), (GLfloat)screenWidth / (GLfloat)screenHeight, 0.1f, 100.0f);//FOV, Radio de aspecto,znear,zfar
-	glm::vec3 color= glm::vec3(0.0f, 0.0f, 1.0f);
+
+
+	
+
+	projection = glm::perspective(45.0f, (GLfloat)screenWidth / (GLfloat)screenHeight, 0.1f, 100.0f);//FOV, Radio de aspecto,znear,zfar
+	//projection = glm::ortho(0.0f, (GLfloat)screenWidth, 0.0f, (GLfloat)screenHeight, 0.1f, 1000.0f);//Izq,Der,Fondo,Alto,Cercania,Lejania
 	while (!glfwWindowShouldClose(window))
 	{
-		
-		Inputs(window);
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 		glfwPollEvents();
 
 		// Render
 		// Clear the colorbuffer
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
 
 
-		
+		// Draw our first triangle
 		ourShader.Use();
 		glm::mat4 model=glm::mat4(1);
 		glm::mat4 view=glm::mat4(1);
-		glm::mat4 modelTemp = glm::mat4(1.0f); //Temp
-		glm::mat4 modelTemp2 = glm::mat4(1.0f); //Temp
 	
-
-
-
-		//View set up 
-		view = glm::translate(view, glm::vec3(movX,movY, movZ));
-		view = glm::rotate(view, glm::radians(rot), glm::vec3(0.0f, 1.0f, 0.0f));
+		view = glm::translate(view, glm::vec3(0.0f,0.0f,-10.0f));
+		model = glm::rotate( model, 0.5f, glm::vec3( 1.0f, 0.0f, 0.0f ) ); // use to compare orthographic and perspective projection
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		//view = glm::translate( view, glm::vec3( screenWidth / 2, screenHeight / 2,-700.0f ) ); // use with orthographic projection
 		
 		GLint modelLoc = glGetUniformLocation(ourShader.Program, "model");
 		GLint viewLoc = glGetUniformLocation(ourShader.Program, "view");
 		GLint projecLoc = glGetUniformLocation(ourShader.Program, "projection");
-		GLint uniformColor = ourShader.uniformColor;
-
+		
 		glUniformMatrix4fv(projecLoc, 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-	
+		
 
 		glBindVertexArray(VAO);
-		
-		//Model 
-		model = glm::rotate(model, glm::radians(hombro), glm::vec3(0.0f, 0.0, 1.0f)); //hombro
-		modelTemp = model = glm::translate(model, glm::vec3(1.5f, 0.0f, 0.0f)); //1
-		model = glm::scale(model, glm::vec3(3.0f, 1.0f, 1.0f)); //2
-		color = glm::vec3(0.0f, 1.0f, 0.0f);
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glDrawArrays(GL_TRIANGLES, 0, 36);//A
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
-		//CODO
-
-		model = glm::translate(modelTemp, glm::vec3(1.5f, 0.0f, 0.0f)); //codo //3
-		model = glm::rotate(model, glm::radians(codo), glm::vec3(0.0f, 1.0, 0.0f)); //codo
-		modelTemp = model = glm::translate(model, glm::vec3(1.0f, 0.0f, 0.0f)); //codo //4
+		model =glm::mat4(1);
+		model = glm::translate(model, glm::vec3(2.0f,2.0f,0.0f));
+		model = glm::rotate(model, 0.30f, glm::vec3(0.0f, 1.0f, 0.0f)); // use to compare orthographic and perspective projection
 		model = glm::scale(model, glm::vec3(2.0f, 1.0f, 1.0f));
-
-		color = glm::vec3(1.0f, 0.0f, 1.0f);
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glDrawArrays(GL_TRIANGLES, 0, 36);//A
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
-		//MANO
-		
-		model = glm::translate(modelTemp, glm::vec3(1.0f, 0.0f, 0.0f)); //mano
-		model = glm::rotate(model, glm::radians(mano), glm::vec3(1.0f, 0.0, 0.0f)); //mano
-		modelTemp = model = glm::translate(model, glm::vec3(0.5f, 0.0f, 0.0f)); //mano
+
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(-3.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, 0.5f, glm::vec3(0.0f, 0.0f, 1.0f)); // use to compare orthographic and perspective projection
+		model = glm::scale(model, glm::vec3(1.0f, 2.0f, 1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(2.0f, 2.0f, 2.0f));
+		model = glm::rotate(model, 0.2f, glm::vec3(0.0f, 1.0f, 2.0f)); // use to compare orthographic and perspective projection
+		model = glm::scale(model, glm::vec3(0.10f, 0.10f, 0.10f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(1.0f, 1.0f, 3.0f));
+		model = glm::rotate(model, 0.5f, glm::vec3(1.0f, 0.0f, 0.0f)); // use to compare orthographic and perspective projection
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-
-		color = glm::vec3(1.0f, 1.0f, 0.0f);
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glDrawArrays(GL_TRIANGLES, 0, 36);//A
-
-		//FALANGE 1
-		model = glm::translate(modelTemp, glm::vec3(-0.5f, 0.0f, 0.0f)); //falange1
-		model = glm::rotate(model, glm::radians(falange1), glm::vec3(1.0f, 0.0, 0.0f)); //falange1
-		modelTemp2 = modelTemp = model = glm::translate(model, glm::vec3(0.25f, 0.125f, +0.625f)); //falange1
-		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.5f));
-
-		color = glm::vec3(1.0f, 0.0f, 0.0f);
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glDrawArrays(GL_TRIANGLES, 0, 36);//A
-
-		//FALANGE 4
-		model = glm::translate(modelTemp2, glm::vec3(-0.0f, 0.0f, 0.5f)); //falange1
-		model = glm::rotate(model, glm::radians(falange4), glm::vec3(1.0f, 0.0, 0.0f)); //falange1
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, +0.0f)); //falange1
-		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.125f));
-
-		color = glm::vec3(0.0f, 1.0f, 1.0f);
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glDrawArrays(GL_TRIANGLES, 0, 36);//A
-
-		//
-
-		//FALANGE 2
-		model = glm::translate(modelTemp, glm::vec3(0.5f, 0.0f, 0.0f)); //falange2
-		model = glm::rotate(model, glm::radians(falange2), glm::vec3(1.0f, 0.0, 0.0f)); //falange2
-		modelTemp2 = model = glm::translate(model, glm::vec3(0.125f, 0.0f, +0.0f)); //falange2
-		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.5f));
-
-		color = glm::vec3(1.0f, 0.0f, 0.0f);
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glDrawArrays(GL_TRIANGLES, 0, 36);//A
-
-		////FALANGE 3
-		model = glm::translate(modelTemp, glm::vec3(-0.25f, -0.125f, 0.0f)); //falange2
-		model = glm::rotate(model, glm::radians(falange3), glm::vec3(1.0f, 0.0, 0.0f)); //falange2
-		modelTemp2 = model = glm::translate(model, glm::vec3(0.5f, -0.25f, +0.0f)); //falange2
-		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.5f));
-
-		color = glm::vec3(1.0f, 0.0f, 0.0f);
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glDrawArrays(GL_TRIANGLES, 0, 36);//A
-
-		//
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
 
-
-	
-		//
 		
+
+
+		
+	
+
 		// Swap the screen buffers
 		glfwSwapBuffers(window);
 	
@@ -304,48 +289,9 @@ int main() {
 
 	glfwTerminate();
 	return EXIT_SUCCESS;
- }
 
- void Inputs(GLFWwindow *window) {
-	 if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)  //GLFW_RELEASE
-		 glfwSetWindowShouldClose(window, true);
-	 if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		 movX += 0.08f;
-	 if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		 movX -= 0.08f;
-	 if (glfwGetKey(window,GLFW_KEY_UP) == GLFW_PRESS)
-		 movY += 0.08f;
-	 if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		 movY -= 0.08f;
-	 if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		 movZ -= 0.08f;
-	 if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		 movZ += 0.08f;
-	 if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-		 rot += 0.18f;
-	 if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-		 rot -= 0.18f;
-	 if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
-		codo += 0.18f;
-	 if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
-		 codo -= 0.18f;
+  
 
-	 if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
-		 mano += 0.18f;
-	 if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
-		 mano -= 0.18f;
-	 if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-		 falange1 += 0.18f;
-	 if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
-		 falange1 -= 0.18f;
-	 if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
-		 falange2 += 0.18f;
-	 if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
-		 falange2 -= 0.18f;
-	 if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
-		 falange3 += 0.18f;
-	 if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
-		 falange3 -= 0.18f;
- }
+}
 
 
