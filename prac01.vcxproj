@@ -146,4 +146,5 @@
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
   <Target Name="CopyAssimpRuntime" AfterTargets="Build"><Copy SourceFiles="$(ProjectDir)assimp-vc140-mt.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" /></Target>
+  <Target Name="CopyGlewRuntime" AfterTargets="Build"><Copy SourceFiles="$(ProjectDir)glew32.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" /></Target>
 </Project>
