@@ -7,3 +7,5 @@ x86/
 *.suo
 *.VC.db
 *.VC.VC.opendb
+
+External Libraries/
