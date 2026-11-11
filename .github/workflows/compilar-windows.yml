@@ -1,0 +1,17 @@
+name: Compilar main en Windows
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compilar:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v7
+      - uses: microsoft/setup-msbuild@v3
+      - name: Recompilar Debug Win32
+        shell: pwsh
+        run: |
+          msbuild .\prac01.vcxproj /t:Rebuild /p:Configuration=Debug /p:Platform=Win32 "/p:SolutionDir=$env:GITHUB_WORKSPACE/" /nologo /v:minimal
